@@ -1,0 +1,1475 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <conio.h>
+#include <sqlca.h>
+
+void loginMenu(char*, char*, char*);
+void mainMenu();
+
+void tableCreate();
+void tableInsert();
+void tableUpdate();
+void tableDelete();
+void tableQuery();
+void tableDisp();
+void queryInfo();
+void quits();
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+char sno[11];
+char sname[32];
+char sgender[8];
+char sage[4];
+char sdept[32];
+
+char cno[4];
+char cname[22];
+char cpno[4];
+char ccredit[5];
+
+char grade[5];
+
+char temps1[11];
+char temps2[5];
+
+EXEC SQL END DECLARE SECTION;
+
+int main()
+{
+	EXEC SQL BEGIN DECLARE SECTION;
+
+	char user[10], pass[10], server[10];
+
+	EXEC SQL END DECLARE SECTION;
+
+	loginMenu(user, pass, server);
+	mainMenu();
+
+	return 0;
+}
+
+
+
+void loginMenu(char* user, char* pass, char* server)
+{
+	
+
+	printf("\n");
+	printf("----------------------------------Login Menu-----------------------------------");
+	printf("\n_______________________________________________________________________________");
+
+	printf("\nUsername ");
+	fgets(user, 10, stdin);
+	user[strcspn(user, "\n")] = 0;
+
+	printf("\nPassword ");
+	fgets(pass, 10, stdin);
+	pass[strcspn(pass, "\n")] = 0;
+
+	printf("\nServer ");
+	fgets(server, 10, stdin);
+	server[strcspn(server, "\n")] = 0;
+
+	EXEC SQL CONNECT :user IDENTIFIED BY :pass USING :server;
+
+	if (sqlca.sqlcode == 0)
+	{
+		printf("\n");
+		printf("Connecting Success \nUser %s Connected ", user);
+	}
+	else
+	{
+		printf("%.*s\n", sqlca.sqlerrm.sqlerrml, sqlca.sqlerrm.sqlerrmc);
+
+		exit(-1);
+	}
+	
+	while (getchar() != '\n');
+}
+
+void mainMenu()
+{
+	system("cls");
+
+	int input;
+
+	printf("\n\n");
+	printf("  ----------------------------------MAIN MENU----------------------------------\n");
+	printf("  -----------------------------------------------------------------------------                      	\n");
+	printf("                            1917641 Class Directory                                                         	\n");
+	printf("  -----------------------------------------------------------------------------                            \n");
+	printf("                              1. Create  Table    		\n");
+	printf("                              2. Insert  Table    		\n");
+	printf("                              3. Update  Table    	\n");
+	printf("                              4. Delete  Table    		\n");
+	printf("                              5. Query   Table    		\n");
+	printf("                              6. Display Table    	\n");
+	printf("                              7. Show Information 	\n");
+	printf("                              8. Exit - Saved     		\n");
+	printf("                              0. Exit      		\n");
+	printf("                              ------------------- 		\n");
+	printf("                         Input Command :  \n\n");
+	
+	scanf_s("%d", &input);
+
+		switch (input)
+		{
+			case 1: tableCreate(); 	break;
+			case 2: tableInsert(); 	break;
+			case 3: tableUpdate();	break;
+			case 4: tableDelete(); 	break;
+			case 5: tableQuery();  	break;  
+			case 6: tableDisp();   	break;
+			case 7: queryInfo();   	break;
+			case 8: quits();       	break;
+		}
+}
+
+
+void tableCreate()
+{
+	EXEC SQL CREATE TABLE S
+	(
+		sno	NUMBER(9),
+		sname	VARCHAR2(30),
+		sgender  CHAR(6),
+		sage	NUMBER(2),
+		sdept	VARCHAR2(30),
+		
+		PRIMARY KEY(sno)
+	);
+
+	if (sqlca.sqlcode == 0)
+		printf("Student Table Created \n");
+	else
+		printf("Student Table Creation Failed     \n");
+	
+	EXEC SQL CREATE TABLE SC
+	(
+		sno	NUMBER(9),
+		cno	NUMBER(2),
+		grade	NUMBER(3),
+
+		PRIMARY KEY(sno, cno)
+	);
+
+	if (sqlca.sqlcode == 0)
+		printf("Student-Course Table Created \n");
+	else
+		printf("Student-Course Table Creation Failed     \n");
+	
+	EXEC SQL CREATE TABLE C
+	(
+		cno	NUMBER(2),
+		cname	CHAR(20)  NOT NULL,
+		cpno	NUMBER(2),
+		ccredit 	NUMBER(2, 1),
+
+		PRIMARY KEY(cno)
+	);
+
+	if (sqlca.sqlcode == 0)
+		printf("Course Table Created \n");
+	else
+		printf("Course Table Creation Failed     \n");
+
+	while (getchar() != '\n');
+	while (getchar() != '\n');
+	mainMenu();
+}
+
+
+
+
+
+void tableInsert()
+{
+	system("cls");
+
+	int inputIns;
+
+	printf("----------------------------------Insert Table----------------------------------           	\n");
+	printf("1. Course         	\n");
+	printf("2. Stdent       	\n");
+	printf("3. Student-Course 	\n");
+	printf("\nInput Command :  ");
+
+	scanf_s("%d", &inputIns);
+
+	switch (inputIns)
+	{
+		case 1: 
+		{
+			system("cls");
+
+			while (getchar() != '\n');
+
+			printf("Input Course Number       	\n");
+			fgets(cno, 4, stdin);
+			cno[strcspn(cno, "\n")] = 0;
+
+			printf("Input Course Name         	\n");
+			fgets(cname, 22, stdin);
+			cname[strcspn(cname, "\n")] = 0;
+
+			printf("Input Course Prerequisite 	\n");
+			fgets(cpno, 4, stdin);
+			cpno[strcspn(cpno, "\n")] = 0;
+
+			printf("Input Course Credit       	\n");
+			fgets(ccredit, 5, stdin);
+			ccredit[strcspn(ccredit, "\n")] = 0;
+
+			EXEC SQL INSERT INTO C(cno, cname, cpno, ccredit) 							VALUES(:cno, :cname, :cpno, :ccredit);
+
+			if (sqlca.sqlcode == 0)
+				printf("Insertion Successful 	\n");
+			else
+				printf("Insertion Failed     		\n");
+
+			while (getchar() != '\n'); 
+			
+			break;
+		}
+		case 2:
+		{
+			system("cls");
+
+			while (getchar() != '\n');
+
+			printf("Input Student Number     	\n");
+			fgets(sno, 11, stdin);
+			sno[strcspn(sno, "\n")] = 0;
+
+			printf("Input Student Name       	\n");
+			fgets(sname, 32, stdin);
+			sname[strcspn(sname, "\n")] = 0;
+
+			printf("Input Student Gender     	\n");
+			fgets(sgender, 8, stdin);
+			sgender[strcspn(sgender, "\n")] = 0;
+
+			printf("Input Student Age        	\n");
+			fgets(sage, 4, stdin);
+			sage[strcspn(sage, "\n")] = 0;
+
+			printf("Input Student Department 	\n");
+			fgets(sdept, 32, stdin);
+			sdept[strcspn(sdept, "\n")] = 0;
+
+			EXEC SQL INSERT INTO S(sno, sname, sgender, sage, sdept) 						VALUES(:sno, :sname, :sgender, :sage, :sdept);
+
+			if (sqlca.sqlcode == 0)
+				printf("Insertion Successful 	\n");
+			else
+				printf("Insertion Failed     		\n");
+
+			while (getchar() != '\n');
+			
+			break;
+		}
+		case 3:
+		{
+			system("cls");
+			
+			while (getchar() != '\n');
+
+			printf("Input Student Number  	\n");
+			fgets(sno, 11, stdin);
+			sno[strcspn(sno, "\n")] = 0;
+
+			printf("Input Course Number   	\n");
+			fgets(cno, 4, stdin);
+			cno[strcspn(cno, "\n")] = 0;
+
+			printf("Input Grade           		\n");
+			fgets(grade, 5, stdin);
+			grade[strcspn(grade, "\n")] = 0;
+
+			EXEC SQL INSERT INTO SC(sno, cno, grade) VALUES(:sno, :cno, :grade);
+
+			if (sqlca.sqlcode == 0)
+				printf("Insertion Successful \n");
+			else
+				printf("Insertion Failed     \n");
+
+			while (getchar() != '\n');
+			
+			break;
+		}
+	}
+
+	mainMenu();
+}
+
+void tableUpdate()
+{
+	system("cls");
+
+	int inputUp;
+
+	printf("----------------------------------Update Table----------------------------------           \n");
+	printf("1. Table Course         \n");
+	printf("2. Table Student        \n");
+	printf("3. Table Student-Course \n");
+	printf("\nYour Option? ");
+
+	scanf_s("%d", &inputUp);
+
+	EXEC SQL WHENEVER NOT FOUND DO break;
+
+	switch (inputUp)
+	{
+		case 1:
+		{
+			system("cls");
+
+			while (getchar() != '\n');
+
+			printf("Enter Course Number 	\n");
+			fgets(temps2, 4, stdin);
+			temps2[strcspn(temps2, "\n")] = 0;
+			
+			printf("\n");
+			printf("Input Remaining Data      	\n");
+			printf("Input Course Name         	\n");
+			fgets(cname, 22, stdin);
+			cname[strcspn(cname, "\n")] = 0;
+
+			printf("Input Course Prerequisite 	\n");
+			fgets(cpno, 4, stdin);
+			cpno[strcspn(cpno, "\n")] = 0;
+
+			printf("Input Course Credit       	\n");
+			fgets(ccredit, 5, stdin);
+			ccredit[strcspn(ccredit, "\n")] = 0;
+           
+			EXEC SQL UPDATE C SET cname = :cname, cpno = :cpno, ccredit = :ccredit 
+			WHERE cno = :temps2; 
+			
+			if (sqlca.sqlcode == 0)
+				printf("Update Successful 	\n");
+			else
+				printf("Update Failed     	\n");
+
+			break;
+		}
+		case 2:
+		{
+			system("cls");
+			
+			while (getchar() != '\n');
+
+			printf("Enter Student Number     	\n");
+			fgets(temps1, 11, stdin);
+			temps1[strcspn(temps1, "\n")] = 0;
+		
+			printf("\n");
+			printf("Input Remaining Data     	\n");
+			printf("Input Student Name       	\n");
+			fgets(sname, 32, stdin);
+			sname[strcspn(sname, "\n")] = 0;
+
+			printf("Input Student Gender     	\n");
+			fgets(sgender, 8, stdin);
+			sgender[strcspn(sgender, "\n")] = 0;
+
+			printf("Input Student Age        	\n");
+			fgets(sage, 4, stdin);
+			sage[strcspn(sage, "\n")] = 0;
+
+			printf("Input Student Department 	\n");
+			fgets(sdept, 32, stdin);
+			sdept[strcspn(sdept, "\n")] = 0;			
+           
+			EXEC SQL UPDATE S SET sname = :sname, sgender = :sgender, sage = :sage, 
+			sdept = :sdept WHERE sno = :temps1; 
+			
+			if (sqlca.sqlcode == 0)
+				printf("Update Successful 	\n");
+			else
+				printf("Update Failed     	\n");
+			
+			break;
+		}
+		case 3:
+		{
+			system("cls");
+
+			while (getchar() != '\n');
+
+			printf("Enter Student Number 	\n");
+			fgets(temps1, 11, stdin);
+			temps1[strcspn(temps1, "\n")] = 0;
+			
+			printf("Enter Course Number  	\n");
+			fgets(temps2, 4, stdin);
+			temps2[strcspn(temps2, "\n")] = 0;
+			
+			printf("\n");
+			printf("Input Remaining Data 	\n");
+			printf("Input New Grade      	\n");
+			fgets(grade, 5, stdin);
+			grade[strcspn(grade, "\n")] = 0;
+			
+			EXEC SQL UPDATE SC SET grade = :grade WHERE sno = :temps1 AND cno = :temps2; 
+			
+			if (sqlca.sqlcode == 0)
+				printf("Update Successful 	\n");
+			else
+				printf("Update Failed     	\n");
+			
+			break;
+		}
+	}
+	
+	while (getchar() != '\n');
+	mainMenu();
+}
+
+void tableDelete()
+{
+	system("cls");
+
+	int inputDel;
+	int iterates;
+
+	printf("----------------------------------Delete Row----------------------------------      	\n");
+	printf("1. Table Course         	\n");
+	printf("2. Table Student        	\n");
+	printf("3. Table Student-Course 	\n");
+	printf("\nYour Option? ");
+
+	scanf_s("%d", &inputDel);
+
+	EXEC SQL WHENEVER NOT FOUND DO printf("Table Not Found \n");
+
+	switch (inputDel)
+	{
+		case 1:
+		{
+			system("cls");
+			
+			printf("Choose Data Identification 	\n");
+			printf("1. Course Number           	\n");
+			printf("2. Course Name             	\n");
+			printf("\nYour Option :  ");
+			
+			scanf_s("%d", &iterates);
+
+			if (iterates == 1)
+			{
+				while (getchar() != '\n');
+				
+				printf("\nInput Course Number 	\n");
+				fgets(cno, 4, stdin);
+				cno[strcspn(cno, "\n")] = 0;
+
+				EXEC SQL DELETE FROM C WHERE cno = :cno;
+
+				if (sqlca.sqlcode == 0)
+					printf("Deletion Successful 	\n");
+				else
+					printf("Deletion Failed     		\n");
+			}
+			else if (iterates == 2)
+			{
+				while (getchar() != '\n');
+
+				printf("\nInput Course Name   	\n");
+				fgets(cname, 22, stdin);
+				cname[strcspn(cname, "\n")] = 0;
+
+				EXEC SQL DELETE FROM C WHERE cname = :cname;
+
+				if (sqlca.sqlcode == 0)
+					printf("Deletion Successful 	\n");
+				else
+					printf("Deletion Failed     		\n");
+			}
+
+			break;
+		}
+		case 2:
+		{
+			system("cls");
+			
+			printf("Choose Data Identification 	\n");
+			printf("1. Student Number          	\n");
+			printf("2. Student Name            	\n");
+			printf("\nYour Option :  ");
+
+			scanf_s("%d", &iterates);
+
+			if (iterates == 1)
+			{
+				while (getchar() != '\n');
+
+				printf("\nInput Student Number  	\n");
+				fgets(sno, 11, stdin);
+				sno[strcspn(sno, "\n")] = 0;
+
+				EXEC SQL DELETE FROM S WHERE sno = :sno;
+
+				if (sqlca.sqlcode == 0)
+					printf("Deletion Successful 	\n");
+				else
+					printf("Deletion Failed     		\n");
+			}
+			else if (iterates == 2)
+			{
+				while (getchar() != '\n');
+
+				printf("\nInput Student Name    	\n");
+				fgets(sname, 32, stdin);
+				sname[strcspn(sname, "\n")] = 0;
+
+				EXEC SQL DELETE FROM S WHERE sname = :sname;
+
+				if (sqlca.sqlcode == 0)
+					printf("Deletion Successful 	\n");
+				else
+					printf("Deletion Failed     		\n");
+			}
+
+			break;
+		}
+		case 3:
+		{
+			system("cls");
+
+			while (getchar() != '\n');
+
+			printf("Enter Student Number  \n");
+			fgets(sno, 11, stdin);
+			sno[strcspn(sno, "\n")] = 0;
+
+			printf("Enter Course Number  \n");
+			fgets(cno, 4, stdin);
+			cno[strcspn(cno, "\n")] = 0;
+
+			EXEC SQL DELETE FROM SC WHERE sno = :sno AND cno = :cno;
+
+			if (sqlca.sqlcode == 0)
+				printf("Deletion Successful 	\n");
+			else
+				printf("Deletion Failed     		\n");
+
+			break;
+		}
+	}
+
+	while (getchar() != '\n');	
+	mainMenu();
+}
+
+void tableQuery()
+{
+	system("cls");
+
+	int inputQry, puts, sets;
+
+	printf("----------------------------------Query----------------------------------        	\n");
+	printf("1. Table Course         	\n");
+	printf("2. Table Student        	\n");
+	printf("3. Table Student-Course 	\n");
+	printf("\nYour Option? ");
+
+	scanf_s("%d", &inputQry);
+
+	switch (inputQry)
+	{
+		case 1:
+		{
+			system("cls");
+			
+			printf("Query Regarding : 	\n");
+			printf("1. Course Credit 	\n");
+			printf("2. Course Preq   	\n"); 
+			printf("\nYour Option :  ");
+			
+			scanf_s("%d", &puts);
+
+			if (puts == 1)
+			{
+				system("cls");
+				
+				printf("Query Credit By :   	\n");
+				printf("1. Exact   Amount  		\n");
+				printf("2. Between Amount  	\n");
+				printf("3. Lower   Than 		\n");
+				printf("4. Higher  Than 		\n");
+				printf("\nYour Option :  ");
+
+				scanf_s("%d", &sets);
+
+				if (sets == 1)
+				{
+					system("cls");
+					
+					while (getchar() != '\n');
+					
+					printf("Enter Credit Amount \n");
+					fgets(temps1, 5, stdin);
+					temps1[strcspn(temps1, "\n")] = 0;
+
+					EXEC SQL DECLARE TEMPCC1 CURSOR FOR SELECT cno, 						cname, cpno, ccredit FROM C WHERE ccredit = :temps1;
+					EXEC SQL OPEN TEMPCC1;
+					EXEC SQL WHENEVER NOT FOUND DO break;
+
+					printf("\nEmpty If No Data Found\n");
+							
+					for (;;)
+					{
+						EXEC SQL FETCH TEMPCC1 										INTO :cno, :cname, :cpno, :ccredit;
+
+						printf("\n");
+						printf("Course Number        	%s\n", cno);
+						printf("Course Name          	%s\n", cname);
+						printf("Course Prerequisite  	%s\n", cpno);
+						printf("Course Credit        		%s\n", ccredit);
+					}
+
+					EXEC SQL CLOSE TEMPCC1;
+				}
+				else if (sets == 2)
+				{
+					system("cls");
+				
+					while (getchar() != '\n');
+
+					printf("Enter Lowest  Amount \n");
+					fgets(temps1, 5, stdin);
+					temps1[strcspn(temps1, "\n")] = 0;
+			
+					printf("Enter Highest Amount \n");
+					fgets(temps2, 5, stdin);
+					temps2[strcspn(temps2, "\n")] = 0;
+
+					EXEC SQL DECLARE TEMPCC2 CURSOR FOR SELECT cno, 						cname, cpno, ccredit FROM C WHERE ccredit BETWEEN :temps1 						AND :temps2;
+					EXEC SQL OPEN TEMPCC2;
+					EXEC SQL WHENEVER NOT FOUND DO break;
+
+					printf("\nEmpty If No Data Found\n");
+							
+					for (;;)
+					{
+						EXEC SQL FETCH TEMPCC2 										INTO :cno, :cname, :cpno, :ccredit;
+
+						printf("\n");
+						printf("Course Number        	%s\n", cno);
+						printf("Course Name          	%s\n", cname);
+						printf("Course Prerequisite  	%s\n", cpno);
+						printf("Course Credit        		%s\n", ccredit);
+					}
+							
+					EXEC SQL CLOSE TEMPCC2;
+				}
+				else if (sets == 3)
+				{
+					system("cls");
+					
+					while (getchar() != '\n');
+					
+					printf("Enter Credit Amount \n");
+					fgets(ccredit, 5, stdin);
+					ccredit[strcspn(ccredit, "\n")] = 0;
+
+					EXEC SQL DECLARE TEMPCC3 CURSOR FOR SELECT cno, 						cname, cpno, ccredit FROM C WHERE ccredit < :ccredit;
+					EXEC SQL OPEN TEMPCC3;
+					EXEC SQL WHENEVER NOT FOUND DO break;
+
+					printf("\nEmpty If No Data Found\n");
+							
+					for (;;)
+					{
+						EXEC SQL FETCH TEMPCC3 										INTO :cno, :cname, :cpno, :ccredit;
+
+						printf("\n");
+						printf("Course Number        	%s\n", cno);
+						printf("Course Name          	%s\n", cname);
+						printf("Course Prerequisite  	%s\n", cpno);
+						printf("Course Credit        		%s\n", ccredit);
+					}
+
+					EXEC SQL CLOSE TEMPCC3;
+				}
+				else if (sets == 4)
+				{
+					system("cls");
+					
+					while (getchar() != '\n');
+					
+					printf("Enter Credit Amount \n");
+					fgets(ccredit, 5, stdin);
+					ccredit[strcspn(ccredit, "\n")] = 0;
+
+					EXEC SQL DECLARE TEMPCC4 CURSOR FOR SELECT cno, 						cname, cpno, ccredit FROM C WHERE ccredit > :ccredit;
+					EXEC SQL OPEN TEMPCC4;
+					EXEC SQL WHENEVER NOT FOUND DO break;
+
+					printf("\nEmpty If No Data Found\n");
+							
+					for (;;)
+					{
+						EXEC SQL FETCH TEMPCC4 										INTO :cno, :cname, :cpno, :ccredit;
+
+						printf("\n");
+						printf("Course Number        	%s\n", cno);
+						printf("Course Name          	%s\n", cname);
+						printf("Course Prerequisite  	%s\n", cpno);
+						printf("Course Credit        		%s\n", ccredit);
+					}
+
+					EXEC SQL CLOSE TEMPCC4;
+				}
+
+			}
+			else if (puts == 2)
+			{
+				system("cls");
+
+				while (getchar() != '\n');
+				
+				printf("Input Prerequisite Course \n");
+				fgets(cpno, 4, stdin);
+				cpno[strcspn(cpno, "\n")] = 0;
+
+				EXEC SQL DECLARE TEMPCP CURSOR FOR SELECT cno, cname, cpno, 					ccredit FROM C WHERE cpno = :cpno;
+				EXEC SQL OPEN TEMPCP;
+				EXEC SQL WHENEVER NOT FOUND DO break;
+
+				printf("\nEmpty If No Data Found\n");
+							
+				for (;;)
+				{
+					EXEC SQL FETCH TEMPCP INTO :cno, :cname, :cpno, :ccredit;
+
+					printf("\n");
+					printf("Course Number        	%s\n", cno);
+					printf("Course Name          	%s\n", cname);
+					printf("Course Prerequisite  	%s\n", cpno);
+					printf("Course Credit        		%s\n", ccredit);
+				}
+							
+				EXEC SQL CLOSE TEMPCP;
+			}			
+
+			break;
+		}
+		case 2:
+		{
+			system("cls");
+			
+			printf("Query Regarding Student Age \n");
+			printf("1. Exact   Age  	\n");
+			printf("2. Between Age  	\n");
+			printf("3. Lower   Than 	\n");
+			printf("4. Higher  Than 	\n");
+			printf("\nYour Option :  ");
+			
+			scanf_s("%d", &puts);
+
+			if (puts == 1)
+			{
+				system("cls");
+					
+				while (getchar() != '\n');
+					
+				printf("Enter Exact Age \n");
+				fgets(temps2, 4, stdin);
+				temps2[strcspn(temps2, "\n")] = 0;
+
+				EXEC SQL DECLARE TEMPS1 CURSOR FOR SELECT sno, sname, sgender, 				sage, sdept FROM S WHERE sage = :temps2;
+				EXEC SQL OPEN TEMPS1;
+				EXEC SQL WHENEVER NOT FOUND DO break;
+
+				printf("\nEmpty If No Data Found\n");
+							
+				for (;;)
+				{
+					EXEC SQL FETCH TEMPS1 INTO :sno, :sname, :sgender, :sage, :sdept;
+					
+					printf("\n");
+					printf("Student Number  	%s\n", sno);
+					printf("Student Name    	%s\n", sname);
+					printf("Student Gender  	%s\n", sgender);
+					printf("Student Age     	%s\n", sage);
+					printf("Student Dept    	%s\n", sdept);
+				}
+
+				EXEC SQL CLOSE TEMPS1;
+			}
+			else if (puts == 2)
+			{
+				
+				system("cls");
+					
+				while (getchar() != '\n');
+					
+				printf("Enter Low  Age \n");
+				fgets(temps2, 4, stdin);
+				temps2[strcspn(temps2, "\n")] = 0;
+
+				printf("Enter High Age \n");
+				fgets(temps1, 4, stdin);
+				temps1[strcspn(temps1, "\n")] = 0;
+
+				EXEC SQL DECLARE TEMPS2 CURSOR FOR SELECT sno, sname, sgender, 				sage, sdept FROM S WHERE sage BETWEEN :temps2 AND :temps1;
+				EXEC SQL OPEN TEMPS2;
+				EXEC SQL WHENEVER NOT FOUND DO break;
+
+				printf("\nEmpty If No Data Found\n");
+							
+				for (;;)
+				{
+					EXEC SQL FETCH TEMPS2 INTO :sno, :sname, :sgender, :sage, :sdept;
+					
+					printf("\n");
+					printf("Student Number  	%s\n", sno);
+					printf("Student Name    	%s\n", sname);
+					printf("Student Gender  	%s\n", sgender);
+					printf("Student Age     	%s\n", sage);
+					printf("Student Dept    	%s\n", sdept);
+				}
+
+				EXEC SQL CLOSE TEMPS2;
+			}
+			else if (puts == 3)
+			{
+				system("cls");
+					
+				while (getchar() != '\n');
+					
+				printf("Enter Exact Age \n");
+				fgets(sage, 4, stdin);
+				sage[strcspn(sage, "\n")] = 0;
+
+				EXEC SQL DECLARE TEMPS3 CURSOR FOR SELECT sno, sname, sgender, 				sage, sdept FROM S WHERE sage < :sage;
+				EXEC SQL OPEN TEMPS3;
+				EXEC SQL WHENEVER NOT FOUND DO break;
+
+				printf("\nEmpty If No Data Found\n");
+							
+				for (;;)
+				{
+					EXEC SQL FETCH TEMPS3 INTO :sno, :sname, :sgender, :sage, :sdept;
+					
+					printf("\n");
+					printf("Student Number  	%s\n", sno);
+					printf("Student Name    	%s\n", sname);
+					printf("Student Gender  	%s\n", sgender);
+					printf("Student Age     	%s\n", sage);
+					printf("Student Dept    	%s\n", sdept);
+				}
+
+				EXEC SQL CLOSE TEMPS3;
+			}
+			else if (puts == 4)
+			{
+				system("cls");
+					
+				while (getchar() != '\n');
+					
+				printf("Enter Exact Age \n");
+				fgets(sage, 4, stdin);
+				sage[strcspn(sage, "\n")] = 0;
+
+				EXEC SQL DECLARE TEMPS4 CURSOR FOR SELECT sno, sname, sgender, 				sage, sdept FROM S WHERE sage > :sage;
+				EXEC SQL OPEN TEMPS4;
+				EXEC SQL WHENEVER NOT FOUND DO break;
+
+				printf("\nEmpty If No Data Found\n");
+							
+				for (;;)
+				{
+					EXEC SQL FETCH TEMPS4 INTO :sno, :sname, :sgender, :sage, :sdept;
+					
+					printf("\n");
+					printf("Student Number  	%s\n", sno);
+					printf("Student Name    	%s\n", sname);
+					printf("Student Gender  	%s\n", sgender);
+					printf("Student Age     	%s\n", sage);
+					printf("Student Dept    	%s\n", sdept);
+				}
+
+				EXEC SQL CLOSE TEMPS4;
+			}
+	
+			break;
+		}
+		case 3:
+		{
+			system("cls");
+			
+			printf("Query Regarding : 		\n");
+			printf("1. Course Taken Amount 	\n");		
+			printf("2. Grade               		\n");
+			printf("\nYour Option : ");	
+		
+			scanf_s("%d", &puts);
+
+			if (puts == 1)
+			{
+				system("cls");
+
+				while (getchar() != '\n');
+
+				printf("Input Course Taken Amount \n");
+				fgets(temps2, 4, stdin);
+				temps2[strcspn(temps2, "\n")] = 0;
+
+				EXEC SQL DECLARE TEMPSCE CURSOR FOR SELECT sno FROM SC 					GROUP BY sno HAVING COUNT(distinct cno) = :temps2;
+				EXEC SQL OPEN TEMPSCE;
+				EXEC SQL WHENEVER NOT FOUND DO break;
+
+				printf("\nEmpty If No Data Found\n\n");
+							
+				for (;;)
+				{
+					EXEC SQL FETCH TEMPSCE INTO :sno;
+
+					printf("Student Number %s\n", sno);
+				}
+
+				EXEC SQL CLOSE TEMPSCE;
+			}
+			else if (puts == 2)
+			{
+				system("cls");
+			
+				printf("Query Regarding Grade \n");
+				printf("1. Exact   Grade  	\n");
+				printf("2. Between Grade  	\n");
+				printf("3. Lower  Than 	\n");
+				printf("4. Higher Than 	\n");
+				printf("\nYour Option : ");
+			
+				scanf_s("%d", &sets);
+
+				if (sets == 1)
+				{
+					system("cls");
+					
+					while (getchar() != '\n');
+					
+					printf("Enter Exact Grade \n");
+					fgets(grade, 5, stdin);
+					grade[strcspn(grade, "\n")] = 0;
+
+					EXEC SQL DECLARE TEMPSCG1 CURSOR FOR SELECT sno, cno, 					grade FROM SC WHERE grade = :grade;
+					EXEC SQL OPEN TEMPSCG1;
+					EXEC SQL WHENEVER NOT FOUND DO break;
+
+					printf("\nEmpty If No Data Found\n");
+							
+					for (;;)
+					{
+						EXEC SQL FETCH TEMPSCG1 INTO :sno, :cno, :grade;
+
+						printf("\n");
+						printf("Student Number        	%s\n", sno);
+						printf("Course  Number          	%s\n", cno);
+						printf("Grade		  	%s\n", grade);
+					}
+
+					EXEC SQL CLOSE TEMPSCG1;
+				}
+				else if (sets == 2)
+				{
+					system("cls");
+					
+					while (getchar() != '\n');
+					
+					printf("Enter Lower  Grade \n");
+					fgets(temps1, 5, stdin);
+					temps1[strcspn(temps1, "\n")] = 0;
+
+					printf("Enter Higher Grade \n");
+					fgets(temps2, 5, stdin);
+					temps2[strcspn(temps2, "\n")] = 0;
+
+					EXEC SQL DECLARE TEMPSCG2 CURSOR FOR SELECT sno, cno, 					grade FROM SC WHERE grade BETWEEN :temps1 AND :temps2;
+					EXEC SQL OPEN TEMPSCG2;
+					EXEC SQL WHENEVER NOT FOUND DO break;
+
+					printf("\nEmpty If No Data Found\n");
+							
+					for (;;)
+					{
+						EXEC SQL FETCH TEMPSCG2 INTO :sno, :cno, :grade;
+
+						printf("\n");
+						printf("Student Number     		%s\n", sno);
+						printf("Course  Number     	%s\n", cno);
+						printf("Grade			%s\n", grade);
+					}
+
+					EXEC SQL CLOSE TEMPSCG2;
+				}
+				else if (sets == 3)
+				{
+					system("cls");
+					
+					while (getchar() != '\n');
+					
+					printf("Enter Exact Grade \n");
+					fgets(grade, 5, stdin);
+					grade[strcspn(grade, "\n")] = 0;
+
+					EXEC SQL DECLARE TEMPSCG3 CURSOR FOR SELECT sno, cno, 					grade FROM SC WHERE grade < :grade;
+					EXEC SQL OPEN TEMPSCG3;
+					EXEC SQL WHENEVER NOT FOUND DO break;
+
+					printf("\nEmpty If No Data Found\n");
+							
+					for (;;)
+					{
+						EXEC SQL FETCH TEMPSCG3 INTO :sno, :cno, :grade;
+
+						printf("\n");
+						printf("Student Number        	%s\n", sno);
+						printf("Course  Number          	%s\n", cno);
+						printf("Grade			%s\n", grade);
+					}
+
+					EXEC SQL CLOSE TEMPSCG3;
+				}
+				else if (sets == 4)
+				{
+					system("cls");
+					
+					while (getchar() != '\n');
+					
+					printf("Enter Exact Grade \n");
+					fgets(grade, 5, stdin);
+					grade[strcspn(grade, "\n")] = 0;
+
+					EXEC SQL DECLARE TEMPSCG4 CURSOR FOR SELECT sno, cno, grade FROM SC WHERE grade > :grade;
+					EXEC SQL OPEN TEMPSCG4;
+					EXEC SQL WHENEVER NOT FOUND DO break;
+
+					printf("\nEmpty If No Data Found\n");
+							
+					for (;;)
+					{
+						EXEC SQL FETCH TEMPSCG4 INTO :sno, :cno, :grade;
+
+						printf("\n");
+						printf("Student Number        	%s\n", sno);
+						printf("Course  Number          	%s\n", cno);
+						printf("Grade		  	%s\n", grade);
+					}
+
+					EXEC SQL CLOSE TEMPSCG4;
+				}
+			}
+
+			break;
+		}
+	}
+
+	while (getchar() != '\n');
+	mainMenu();	
+}
+
+void tableDisp()
+{
+	system("cls");
+
+	int inputDisp;
+	
+	printf("----------------------------------Table Display---------------------------------- \n");
+	printf("1. Table Course         	\n");
+	printf("2. Table Student        	\n");
+	printf("3. Table Student-Course 	\n");
+	printf("\nYour Option :  ");
+
+	scanf_s("%d", &inputDisp);
+
+	switch (inputDisp)
+	{
+		case 1:
+		{
+			EXEC SQL DECLARE TEMP1 CURSOR FOR SELECT cno, cname, cpno, ccredit FROM C;
+			EXEC SQL OPEN TEMP1;
+			EXEC SQL WHENEVER NOT FOUND DO break;
+
+			printf("\nEmpty If No Data Found\n");
+			
+			for (;;)
+			{
+				EXEC SQL FETCH TEMP1 INTO :cno, :cname, :cpno, :ccredit;
+				
+				printf("\n");
+				printf("Course Number        	%s\n", cno);
+				printf("Course Name          	%s\n", cname);
+				printf("Course Prerequisite  	%s\n", cpno);
+				printf("Course Credit        		%s\n", ccredit);
+			}
+
+			EXEC SQL CLOSE TEMP1;
+
+			break;
+		}
+		case 2:
+		{
+			EXEC SQL DECLARE TEMP2 CURSOR FOR SELECT sno, sname, sgender, sage, sdept FROM S;
+			EXEC SQL OPEN TEMP2;
+			EXEC SQL WHENEVER NOT FOUND DO break;
+
+			printf("\nEmpty If No Data Found\n");
+
+			for (;;)
+			{
+				EXEC SQL FETCH TEMP2 INTO :sno, :sname, :sgender, :sage, :sdept;
+
+				printf("\n");
+				printf("Student Number  	%s\n", sno);
+				printf("Student Name    	%s\n", sname);
+				printf("Student Gender  	%s\n", sgender);
+				printf("Student Age     	%s\n", sage);
+				printf("Student Dept    	%s\n", sdept);
+			}
+
+			EXEC SQL CLOSE TEMP2;
+
+			break;
+		}
+		case 3:
+		{
+			EXEC SQL DECLARE TEMP3 CURSOR FOR SELECT sno, cno, grade FROM SC;
+			EXEC SQL OPEN TEMP3;
+			EXEC SQL WHENEVER NOT FOUND DO break;
+
+			printf("\nEmpty If No Data Found\n");
+			
+			for (;;)
+			{
+				EXEC SQL FETCH TEMP3 INTO :sno, :cno, :grade;
+				
+				printf("\n");
+				printf("Student Number   	%s\n", sno);
+				printf("Course  Number   	%s\n", cno);
+				printf("Student Grade    	%s\n", grade);
+			}
+			
+			EXEC SQL CLOSE TEMP3;
+
+			break;
+		}
+	}
+
+	while (getchar() != '\n');
+	while (getchar() != '\n');
+	mainMenu();
+}
+
+void queryInfo()
+{
+	system("cls");
+
+	int inputInf, puts;
+	
+	printf("----------------------------------Select Table Show Information---------------------------------- 	\n");
+	printf("1. Table Course         		\n");
+	printf("2. Table Student        		\n");
+	printf("3. Table Student-Course 		\n");
+	printf("\nYour Option :  ");
+
+	scanf_s("%d", &inputInf);
+
+	switch (inputInf)
+	{
+		case 1:
+		{
+			system("cls");
+			
+			printf("Show Information From : 	\n");
+			printf("1. Course Number 		\n");
+			printf("2. Course Name   		\n");
+			printf("\nYour Option :  ");
+			
+			scanf_s("%d", &puts);
+
+			if (puts == 1)
+			{
+				system("cls");
+				
+				while (getchar() != '\n');
+
+				printf("Enter Course Number \n");
+				fgets(cno, 4, stdin);
+				cno[strcspn(cno, "\n")] = 0;
+
+				EXEC SQL DECLARE TEMP4 CURSOR FOR SELECT cno, cname, cpno, 					ccredit FROM C WHERE cno = :cno;
+				EXEC SQL OPEN TEMP4;
+				EXEC SQL WHENEVER NOT FOUND DO break;
+
+				printf("\nEmpty If No Data Found\n");
+				
+				for (;;)
+				{
+					EXEC SQL FETCH TEMP4 INTO :cno, :cname, :cpno, :ccredit;
+
+					printf("\n");
+					printf("Course Number        	%s\n", cno);
+					printf("Course Name          	%s\n", cname);
+					printf("Course Prerequisite  	%s\n", cpno);
+					printf("Course Credit        		%s\n", ccredit);
+				}
+				
+				EXEC SQL CLOSE TEMP4;
+			}
+			else if (puts == 2)
+			{
+				system("cls");
+				
+				while (getchar() != '\n');	
+
+				printf("Input Course Name   \n");
+				fgets(cname, 22, stdin);
+				cname[strcspn(cname, "\n")] = 0;
+
+				EXEC SQL DECLARE TEMP5 CURSOR FOR SELECT cno, cname, cpno, 					ccredit FROM C WHERE cname = :cname;
+				EXEC SQL OPEN TEMP5;
+				EXEC SQL WHENEVER NOT FOUND DO break;
+
+				printf("\nEmpty If No Data Found\n");
+
+				for (;;)
+				{
+					EXEC SQL FETCH TEMP5 INTO :cno, :cname, :cpno, :ccredit;
+
+					printf("\n");
+					printf("Course Number        	%s\n", cno);
+					printf("Course Name          	%s\n", cname);
+					printf("Course Prerequisite  	%s\n", cpno);
+					printf("Course Credit        		%s\n", ccredit);
+				}
+				
+				EXEC SQL CLOSE TEMP5;			
+			}
+
+			break;	
+		}
+		case 2:
+		{
+			system("cls");
+			
+			printf("Show Information From? :  	\n");
+			printf("1. Student Number		\n");
+			printf("2. Student Name   		\n");
+			printf("3. Student Gender 		\n");
+			printf("4. Student Dept   		\n");
+			printf("\nYour Option :  ");
+
+			scanf_s("%d", &puts);
+
+			if (puts == 1)
+			{
+				system("cls");
+				
+				while (getchar() != '\n');
+				
+				printf("Enter Student Number :    \n");
+				fgets(sno, 11, stdin);
+				sno[strcspn(sno, "\n")] = 0;
+		
+				EXEC SQL DECLARE TEMP6 CURSOR FOR SELECT sno, sname, sgender, 					sage, sdept FROM S WHERE sno = :sno;
+				EXEC SQL OPEN TEMP6;
+				EXEC SQL WHENEVER NOT FOUND DO break;
+
+				printf("\nEmpty If No Data Found\n");
+							
+				for (;;)
+				{
+					EXEC SQL FETCH TEMP6 INTO :sno, :sname, :sgender, :sage, :sdept;
+
+					printf("\n");
+					printf("Student Number  	%s\n", sno);
+					printf("Student Name    	%s\n", sname);
+					printf("Student Gender  	%s\n", sgender);
+					printf("Student Age     	%s\n", sage);
+					printf("Student Dept    	%s\n", sdept);
+				}
+				
+				EXEC SQL CLOSE TEMP6;
+			}
+			else if (puts == 2)
+			{
+				system("cls");
+				
+				while (getchar() != '\n');
+				
+				printf("Enter Student Name :     \n");
+				fgets(sname, 32, stdin);
+				sname[strcspn(sname, "\n")] = 0;
+				
+				EXEC SQL DECLARE TEMP7 CURSOR FOR SELECT sno, sname, sgender, 					sage, sdept FROM S WHERE sname = :sname;
+				EXEC SQL OPEN TEMP7;
+				EXEC SQL WHENEVER NOT FOUND DO break;
+
+				printf("\nEmpty If No Data Found\n");
+				
+				for (;;)
+				{
+					EXEC SQL FETCH TEMP7 INTO :sno, :sname, :sgender, :sage, :sdept;
+
+					printf("\n");
+					printf("Student Number  	%s\n", sno);
+					printf("Student Name    	%s\n", sname);
+					printf("Student Gender  	%s\n", sgender);
+					printf("Student Age     	%s\n", sage);
+					printf("Student Dept    	%s\n", sdept);							
+				}
+				
+				EXEC SQL CLOSE TEMP7;
+			}
+			else if (puts == 3)
+			{
+				system("cls");
+				
+				while (getchar() != '\n');
+				
+				printf("Input Student Gender :   \n");
+				fgets(sgender, 8, stdin);
+				sgender[strcspn(sgender, "\n")] = 0;
+
+				EXEC SQL DECLARE TEMP8 CURSOR FOR SELECT sno, sname, sgender, 					sage, sdept FROM S WHERE sgender = :sgender;
+				EXEC SQL OPEN TEMP8;
+				EXEC SQL WHENEVER NOT FOUND DO break;
+
+				printf("\nEmpty If No Data Found\n");
+				
+				for (;;)
+				{
+					EXEC SQL FETCH TEMP8 INTO :sno, :sname, :sgender, :sage, :sdept;
+
+					printf("\n");
+					printf("Student Number  	%s\n", sno);
+					printf("Student Name    	%s\n", sname);
+					printf("Student Gender  	%s\n", sgender);
+					printf("Student Age     	%s\n", sage);
+					printf("Student Dept    	%s\n", sdept);	
+				}
+							
+				EXEC SQL CLOSE TEMP8;
+			}
+			else if (puts == 4)
+			{
+				system("cls");
+				
+				while (getchar() != '\n');
+				
+				printf("Input Student Department :  \n");
+				fgets(sdept, 32, stdin);
+				sdept[strcspn(sdept, "\n")] = 0;
+
+				EXEC SQL DECLARE TEMP9 CURSOR FOR SELECT sno, sname, sgender, 					sage, sdept FROM S WHERE sdept = :sdept;
+				EXEC SQL OPEN TEMP9;
+				EXEC SQL WHENEVER NOT FOUND DO break;
+
+				printf("\nEmpty If No Data Found\n");
+							
+				for (;;)
+				{
+					EXEC SQL FETCH TEMP9 INTO :sno, :sname, :sgender, :sage, :sdept;
+
+					printf("\n");
+					printf("Student Number  	%s\n", sno);
+					printf("Student Name    	%s\n", sname);
+					printf("Student Gender  	%s\n", sgender);
+					printf("Student Age     	%s\n", sage);
+					printf("Student Dept    	%s\n", sdept);	
+				}
+				
+				EXEC SQL CLOSE TEMP9;
+			}
+
+			break;	
+		}
+		case 3:
+		{
+			system("cls");
+			
+			printf("Show Information From :  \n");
+			printf("1. Student Number \n");
+			printf("2. Course  Number \n");
+			printf("\nYour Option :  ");
+			
+			scanf_s("%d", &puts);
+
+			if (puts == 1)
+			{
+				system("cls");
+				
+				while (getchar() != '\n');
+				
+				printf("Enter Student Number :  \n");
+				fgets(sno, 11, stdin);
+				sno[strcspn(sno, "\n")] = 0;
+
+				EXEC SQL DECLARE TEMP10 CURSOR FOR SELECT sno, cno, grade 					FROM SC WHERE sno = :sno;
+				EXEC SQL OPEN TEMP10;
+				EXEC SQL WHENEVER NOT FOUND DO break;
+
+				printf("\nEmpty If No Data Found\n");
+							
+				for (;;)
+				{
+					EXEC SQL FETCH TEMP10 INTO :sno, :cno, :grade;
+					
+					printf("\n");
+					printf("Student Number   	%s\n", sno);
+					printf("Course  Number   	%s\n", cno);
+					printf("Student Grade    	%s\n", grade);
+				}
+				
+				EXEC SQL CLOSE TEMP10;
+			}
+			else if (puts == 2)
+			{
+				system("cls");
+				
+				while (getchar() != '\n');
+
+				printf("Enter Course Number : \n");
+				fgets(cno, 4, stdin);
+				cno[strcspn(cno, "\n")] = 0;
+
+				EXEC SQL DECLARE TEMP11 CURSOR FOR SELECT sno, cno, grade 					FROM SC WHERE cno = :cno;
+				EXEC SQL OPEN TEMP11;
+				EXEC SQL WHENEVER NOT FOUND DO break;
+
+				printf("\nEmpty If No Data Found\n");
+							
+				for (;;)
+				{
+					EXEC SQL FETCH TEMP11 INTO :sno, :cno, :grade;
+
+					printf("\n");
+					printf("Student Number   	%s\n", sno);
+					printf("Course  Number   	%s\n", cno);
+					printf("Student Grade    	%s\n", grade);
+				}
+							
+				EXEC SQL CLOSE TEMP11;
+			}
+
+			break;							
+		}
+	}
+	
+	while (getchar() != '\n');
+	mainMenu();
+}
+
+void quits()
+{
+	EXEC SQL COMMIT WORK RELEASE;
+
+	exit(0);
+}
